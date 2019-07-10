@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <style>
+        table,
+        tr,
+        td {
+            border: 2px solid lightgray;
+            border-collapse: collapse;
+            margin: auto;
+
+        }
+
+        tr,
+        td {
+            width: 20px;
+            height: 20px;
+            padding: 0px;
+            margin: 0px;
+
+        }
+
+        /*要顯示的樣式*/
+        .red {
+            background-color: red;
+        }
+
+        .black {
+            background-color: blue;
+        }
+
+
+        /*要消失的樣式*/
+        .white {
+            background-color: black;
+        }
+
+        .yellow {
+            background-color: yellow;
+        }
+
+        button,
+        h1,
+        p {
+            font-family: "Merriweather", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        /*        版面背景底色*/
+        body {
+            text-align: center;
+            background-color: black;
+            position: relative;
+            padding: 20px;
+        }
+
+        h1,
+        p {
+            color: white;
+        }
+
+        .lip {
+            font-size: 1rem;
+
+        }
+
+        .buttons {
+            width: auto;
+            color: black;
+            text-decoration: none;
+            border-radius: 30px;
+            background-color: white;
+            margin-bottom: 50px;
+            margin-left: 30px;
+            /*          background-color: #f4623a;*/
+        }
+
+        .buttons:hover {
+            background-color: black;
+            color: white;
+
+        }
+
+        #menu {
+            width: auto;
+            /*            float: right;*/
+            background-color: #000;
+            opacity: 0.9;
+            position: absolute;
+            right: 0px;
+
+        }
+
+        li,
+        ul {
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+            width: 200px;
+        }
+
+
+
+
+        .cl-menu li {
+            position: relative;
+            border-radius: 30px;
+        }
+
+
+
+        .cl-menu>li:hover {
+            font-weight: bold;
+            opacity: 1;
+                        filter: alpha(opacity=100);
+        }
+
+
+
+        .cl-menu li:hover {
+            background-color: #66819C;
+        }
+
+
+
+        .cl-menu li ul {
+            position: absolute;
+            top: 0;
+
+            right: 100%;
+            /*            border: 1px solid #000;*/
+            display: none;
+
+
+        }
+
+        .cl-menu li:hover>ul {
+            display: block;
+            opacity: 1;
+
+        }
+
+        .cl-menu li ul li {
+            background: brown;
+            border: 1px solid #000;
+            border-radius: 30px;
+
+        }
+    </style>
+</head>
+
+<body onkeydown="keyDown(event)">
+    <div id='menu'>
+        <ul class="cl-menu">
+            <li>
+                <p class="lip">貪吃蛇</p>
+                <ul>
+                    <li>
+                        <p class="lip">貪吃的蛇</p>
+                    </li>
+
+
+                </ul>
+            </li>
+            <li>
+                <p class="lip">基本介紹</p>
+                <ul>
+                    <li>
+                        <p class="lip">蛇 : 藍色 食物 : 黃色</p>
+                    </li>
+                    <li>
+                        <p class="lip">隨著等級提升，速度也會隨之提升</p>
+                    </li>
+
+                </ul>
+            </li>
+            <li>
+                <p class="lip">操作方式 </p>
+                <ul>
+                    <li>
+                        <p class="lip">上:↑下:↓左:←右:→</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p class="lip">遊戲規則 </p>
+                <ul>
+                    <li>
+                        <p class="lip">1.不可以走出邊界</p>
+                    </li>
+                    <li>
+                        <p class="lip">2.不可以吃到蛇本身</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p class="lip">得分方式</p>
+                <ul>
+                    <li>
+                        <p class="lip">每吃一個食物分數+1</p>
+                    </li>
+
+                </ul>
+            </li>
+
+        </ul>
+
+    </div>
+    <h1>score</h1>
+
+    <h1 id="applecount">0</h1>
+    <h1 id="level">Level&nbsp;&nbsp;1</h1>
+    <!--    <h1 id="speed">500</h1>-->
+
+
+    <table id="table">
+
+    </table>
+
+    <p id="applexy"></p>
+
+    <button id="start" class="buttons" onclick="btnstart()">Start</button>
+    <button id="reset" class="buttons" onclick="btnreset()">Reset</button>
+    <button id="change" class="buttons" onclick="btnchange()">Pause</button>
+
+    <script>
+        var time = "";
+        var foodtime = "";
+        var hw = 10; //範圍長寬
+        var foodspeed = 500 //食物閃爍速度
+        var speed = 500; //蛇移動速度
+        var level = "1";
+        var snakelengh = 3
+        var direction = 2; //右
+        var applex = "";
+        var appley = "";
+        var x = 0; //蛇頭初始做標x
+        var y = snakelengh - 1; //蛇頭初始做標y
+        var app = 0; //分數
+        var snake = new Array();
+        var allbox = new Array();
+        var trs;
+        //------------------------------產生移動範圍-----------------------------------------
+
+        window.onload = function() {
+            for (var i = 0; i < hw; i++) {
+                var row = document.createElement("tr");
+                trs = new Array();
+
+                for (var j = 0; j < hw; j++) {
+                    var col = document.createElement("td");
+
+                    trs[j] = col;
+                    row.appendChild(col);
+
+                }
+                document.getElementById("table").appendChild(row);
+                allbox[i] = trs;
+            }
+
+            //snake[a] 蛇身
+            for (var a = 0; a < snakelengh; a++) {
+                snake[a] = allbox[0][a];
+                allbox[0][a].className = ("black");
+            }
+            //            $(".black").css("color", "blue");
+            //            alert("123");
+
+            apple();
+
+        }
+        //----------------------------------------------------------------------------------
+
+        //--------------------------button--------------------------------------------------
+        function btnstart() {
+            start();
+            setTimeout("light()", foodspeed);
+        }
+
+        function btnreset() {
+            clearTimeout(time);
+            for (var i = 0; i < hw; i++) {
+                for (var j = 0; j < hw; j++) {
+                    allbox[i][j].classList.remove("black");
+                    allbox[i][j].classList.remove("white");
+                    allbox[i][j].classList.remove("yellow");
+                }
+            }
+            snake.splice(0, snake.length);
+            direction = 2;
+            x = 0;
+            y = 2;
+            app = 0;
+            speed = 500;
+            snakelengh = 3
+            level = "1";
+            document.getElementById("level").innerHTML = ("Level" + "&nbsp;&nbsp;" + level);
+            document.getElementById("level").style.color = "white";
+            document.getElementById("applecount").innerHTML = (app);
+            for (var a = 0; a < snakelengh; a++) {
+                snake[a] = allbox[0][a];
+                allbox[0][a].className = ("black");
+            }
+
+            apple();
+
+        }
+
+        function btnchange() {
+            clearTimeout(time);
+            clearTimeout(foodtime);
+            allbox[appley][applex].className = "yellow";
+        }
+            //------------------2player-----------------
+//            for (var a = 0; a < snakelengh; a++) {
+//                snake[a] = allbox[9][a];
+//                allbox[9][a].className = ("red");
+//            }
+//            for (var a = 0; a < snakelengh; a++) {
+//                snake[a] = allbox[0][a];
+//                allbox[0][a].className = ("black");
+//            }
+//        }
+        //------------------2player-----------------
+
+        //            var newhw = 30;
+        //
+        //            var element = document.getElementById("table");
+        //            element.parentNode.removeChild(element);
+        //            
+        //            var newtable = document.createElement("table");
+        //            var currentp = document.getElementById("applexy");
+        //            document.body.insertBefore(newtable, currentp);
+        //            document.createElement("table");
+
+
+
+
+        //            $(".black").css("color", "blue");
+        //            alert("123");
+
+
+
+
+
+        //
+        //            var color_r = Math.floor(Math.random() * 255);
+        //            var color_g = Math.floor(Math.random() * 255);
+        //            var color_b = Math.floor(Math.random() * 255);
+        //           
+        //            $(document).ready(function() {
+        //                $(".black").css("background-color","red");
+        //
+        //            });
+        //
+        //            alert("123");
+
+
+        //------------------------速度等級----------------------------------------------------
+        function speedlevel() {
+            var level_id = document.getElementById("level")
+            if (speed < 450 && speed > 400) {
+                level = "2";
+                level_id.style.color = "#FFDCDC";
+            } else if (speed < 400 && speed > 350) {
+                level = "3";
+                level_id.style.color = "#FFC1C1";
+            } else if (speed < 350 && speed > 300) {
+                level = "4";
+                level_id.style.color = "#FFAFAF";
+            } else if (speed < 350 && speed > 250) {
+                level = "5";
+                level_id.style.color = "#FF9696";
+            } else if (speed < 250 && speed > 200) {
+                level = "6";
+                level_id.style.color = "#FF7575";
+            } else if (speed < 200 && speed > 150) {
+                level = "7";
+                level_id.style.color = "#FF5454";
+            } else if (speed < 200) {
+                level = "Max";
+                level_id.style.color = "#FF2D2D";
+
+            }
+            level_id.innerHTML = ("Level" + "&nbsp;&nbsp;" + level);
+
+        }
+
+        function food() {
+            if (app >= 2 && app < 4) {
+                speed = 440;
+            } else if (app >= 4 && app < 8) {
+                speed = 390;
+            } else if (app >= 8 && app < 12) {
+                speed = 340;
+            } else if (app >= 12 && app < 16) {
+                speed = 290;
+            } else if (app >= 16 && app < 20) {
+                speed = 240;
+            } else if (app >= 20 && app < 28) {
+                speed = 190;
+            } else if (app >= 28) {
+                speed = 140;
+
+            }
+            //-----------------------------------------------------------------------------------  
+
+        }
+        //------------------------------隨機生成食物------------------------------------------ 
+        function apple() {
+            if (app % 2 == 0) {
+                for (var d = 0; d <= 1; d++) {
+                    appley = Math.floor(Math.random() * hw);
+                    applex = Math.floor(Math.random() * hw);
+                    if (allbox[appley][applex].className == "black") { //==
+
+                        apple();
+                    } else {
+
+                        allbox[appley][applex].className = "yellow";
+                        //                document.getElementById("applexy").innerHTML = ("appley:" + appley + "applex:" + applex)
+                        //alert(allbox[appley][applex].className);
+                        light();
+                    }
+
+                }
+
+            } else {
+                appley = Math.floor(Math.random() * hw);
+                applex = Math.floor(Math.random() * hw);
+                if (allbox[appley][applex].className == "black") { //==
+
+                    apple();
+                } else {
+
+                    allbox[appley][applex].className = "yellow";
+                    light();
+                }
+            }
+
+        }
+
+
+        //------------------------------食物閃爍------------------------------------------ 
+        function light() {
+            if (allbox[appley][applex].className == "yellow") { //==
+                allbox[appley][applex].className = "white";
+                clearTimeout(foodtime);
+            } else {
+                allbox[appley][applex].className = "yellow";
+            }
+            foodtime = setTimeout("light()", foodspeed);
+        }
+        //----------------------------------------------------------------------------------
+        //-------------------------gameover判定----------------------------------------------
+        function gg() {
+            alert("撞牆死掉了");
+            clearTimeout(time);
+            
+
+        }
+
+        function eatgg(myobj) {
+            var health = true;
+
+            for (var c = 0; c < snake.length; c++) {
+                if (snake[c] == myobj) {
+                    alert("吃自己");
+                    health = false;
+                    clearTimeout(time);
+                }
+
+            }
+            return health;
+        }
+        //----------------------------------------------------------------------------------
+        //----------------------------移動辦法------------------------------------------------
+        function appear(myobj) {
+            myobj[0].className = "white";
+        }
+
+        function now(myobj) {
+            myobj[myobj.length - 1].className = "black";
+        }
+        //document.write(allbox);    
+        //----------------------------------------------------------------------------------
+        //--------------------------start主要控制---------------------------------------------
+        function start() {
+            time = setTimeout("start()", speed);
+            //左
+            if (direction == 1) {
+
+                if (y - 1 >= 0) {
+
+                    if (eatgg(allbox[x][y - 1])) {
+
+
+                        if (allbox[appley][applex] == allbox[x][y - 1]) {
+                            snakelengh = snakelengh + 1;
+                            snake[snake.length] = allbox[x][y - 1]
+                            allbox[x][y - 1].className = "black";
+                            //alert(snakelengh);
+                            apple();
+                            app = app + 1;
+                            food();
+                            speedlevel();
+                            //                            document.getElementById("speed").innerHTML = (speed);
+                            document.getElementById("applecount").innerHTML = (app);
+                            y = y - 1;
+                        } else {
+                            appear(snake);
+                            for (var b = 0; b < snakelengh - 1; b++) {
+                                snake[b] = snake[b + 1];
+                            }
+                            snake[snakelengh - 1] = allbox[x][y - 1];
+                            y = y - 1;
+                            now(snake);
+                        }
+                    }
+
+                } else {
+                    gg();
+                }
+            }
+            //右
+            if (direction == 2) {
+
+                if (y + 1 < hw) {
+
+                    if (eatgg(allbox[x][y + 1])) {
+
+                        if (allbox[appley][applex] == allbox[x][y + 1]) {
+                            snakelengh = snakelengh + 1;
+                            snake[snake.length] = allbox[x][y + 1]
+                            allbox[x][y + 1].className = "black";
+                            //alert(snakelengh);
+                            apple();
+                            app = app + 1;
+                            food();
+                            speedlevel();
+                            //                            document.getElementById("speed").innerHTML = (speed);
+                            document.getElementById("applecount").innerHTML = (app);
+                            y = y + 1;
+                        } else {
+                            appear(snake);
+                            for (var b = 0; b < snakelengh - 1; b++) {
+                                snake[b] = snake[b + 1];
+                                //  alert(b);
+                            }
+                            snake[snakelengh - 1] = allbox[x][y + 1];
+                            y = y + 1;
+                            now(snake);
+                        }
+                    }
+                } else {
+                    gg();
+                }
+            }
+            //上
+            if (direction == 3) {
+
+                if (x - 1 >= 0) {
+
+                    if (eatgg(allbox[x - 1][y])) {
+
+                        if (allbox[appley][applex] == allbox[x - 1][y]) {
+                            snakelengh = snakelengh + 1;
+                            snake[snake.length] = allbox[x - 1][y]
+                            allbox[x - 1][y].className = "black";
+                            //alert(snakelengh);
+                            apple();
+                            app = app + 1;
+                            food();
+                            speedlevel();
+                            //                            document.getElementById("speed").innerHTML = (speed);
+                            document.getElementById("applecount").innerHTML = (app);
+                            x = x - 1;
+                        } else {
+                            appear(snake);
+                            for (var b = 0; b < snakelengh - 1; b++) {
+                                snake[b] = snake[b + 1];
+                            }
+                            snake[snakelengh - 1] = allbox[x - 1][y];
+                            x = x - 1;
+                            now(snake);
+                        }
+                    }
+                } else {
+                    gg();
+                }
+
+            }
+
+            //下
+            if (direction == 4) {
+
+                if (x + 1 < hw) {
+
+                    if (eatgg(allbox[x + 1][y])) {
+
+                        if (allbox[appley][applex] == allbox[x + 1][y]) {
+                            snakelengh = snakelengh + 1;
+                            snake[snake.length] = allbox[x + 1][y]
+                            allbox[x + 1][y].className = "black";
+                            //alert(snakelengh);
+                            apple();
+                            app = app + 1;
+                            food();
+                            //                            document.getElementById("speed").innerHTML = (speed);
+                            document.getElementById("applecount").innerHTML = (app);
+                            x = x + 1;
+                        } else {
+                            appear(snake);
+                            for (var b = 0; b < snakelengh - 1; b++) {
+                                snake[b] = snake[b + 1];
+                            }
+                            snake[snakelengh - 1] = allbox[x + 1][y];
+                            x = x + 1;
+                            now(snake);
+                        }
+                    }
+
+                } else {
+                    gg();
+                }
+            }
+
+        }
+        //----------------------------------------------------------------------------------
+        //--------------------------------鍵盤控制--------------------------------------------
+        function keyDown(event) {
+
+            if (event.keyCode == 37) { //左37
+                direction = 1;
+                clearTimeout(time);
+                start();
+
+            }
+            if (event.keyCode == 39) { //右39
+                direction = 2;
+                clearTimeout(time);
+                start();
+                //alert(direction);
+            }
+            if (event.keyCode == 38) { //上38
+                direction = 3;
+                clearTimeout(time);
+                start();
+            }
+            if (event.keyCode == 40) { //下40
+                //alert("下");
+                direction = 4;
+                clearTimeout(time);
+                start();
+            }
+            //            if (event.keyCode == 108){
+            //                direction = 2;
+            //                clearTimeout(time);
+            //                start();
+            //            }
+        }
+        //----------------------------------------------------------------------------------
+    </script>
+
+</body>
+
+</html>
