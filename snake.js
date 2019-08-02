@@ -3,28 +3,15 @@
         var pauseBtn = document.querySelector('#pauseBtn');
         var body = document.querySelector('body');
         var scoreBoard = document.querySelector('#score');
-        var level =document.querySelector('#level');
+        var levelBoard = document.querySelector('#level');
 
+        //監聽
         startBtn.addEventListener('click', startGame);
         resetBtn.addEventListener('click', resetGame);
         pauseBtn.addEventListener('click', pauseGame);
         body.addEventListener('keydown', checkDir);
-        //--------------------------button--------------------------------------------------
-        function startGame() {
-            if (snake.move == false) {
-                snakeMoveInterval = setInterval(snakeMove, snake.speed);
-                snake.move = true;
-            }
-        }
 
-        function resetGame() {
-            clearTimeout(time);
-            snake.move = false;
-        }
-
-        function pauseGame() {
-            box[appley][applex].className = "yellow";
-        }
+        //宣告
         var snakeBody = [];
         var snake = {
             dir: 'right',
@@ -34,15 +21,13 @@
             move: false
         }
 
-
-
-        var snakeMoveInterval;
-        var foodtime = "";
+        var snakeMoveTimeout;
         var size = 10; //table 長and寬
         var level = "1";
         var score = 0; //分數
         var box = [];
         var trs;
+        var pauseflag = false;
 
         var food = {
             x: Math.floor(Math.random() * size),
@@ -51,19 +36,14 @@
             setColor: function (color) {
                 box[this.y][this.x].className = color;
                 this.color = color;
-            },
-            light: false
+            }
         }
 
-        console.log(food.x);
-        console.log(food.y);
-
-        //------------------------------產生移動範圍-----------------------------------------
-
+        //建立table
         window.onload = function () {
             for (var i = 0; i < size; i++) {
                 var row = document.createElement("tr");
-                trs = new Array();
+                trs = [];
 
                 for (var j = 0; j < size; j++) {
                     var col = document.createElement("td");
@@ -76,39 +56,86 @@
                 box[i] = trs;
             }
 
+            snakeInit();
+            setInterval(foodLight, 500);
+        }
+
+
+        function startGame() {
+            if (snake.move === false) {
+                snake.move = true;
+                snakeMove();
+            }
+        }
+
+        function resetGame() {
+            clearTimeout(snakeMoveTimeout);
+            snake.move = false;
+            scoreBoard.textContent = 0;
+            levelBoard.textContent = 500;
+            snakeInit();
+        }
+
+        function pauseGame() {
+            if (pauseflag === false) {
+                pauseflag = true;
+                clearTimeout(snakeMoveTimeout);
+            } else {
+                pauseflag = false;
+                setTimeout(snakeMove, snake.speed);
+            }
+            console.log(pauseflag);
+        }
+
+        function snakeInit() {
+            for (var i = 0; i < snakeBody.length; i++) {
+                snakeBody[i].className = '';
+            }
+
+            snakeBody.splice(0, snakeBody.length);
+
             for (var i = 0; i < 3; i++) {
                 snakeBody[i] = box[0][i];
                 box[0][i].className = "blue";
             }
+            snake.x = 2;
+            snake.y = 0;
+            snake.dir = 'right';
+            snake.speed = 500;
+            snake.move = false;
         }
-        setInterval(foodLight, 500);
-
-
 
         function checkDir(e) {
-            if (snake.move == false) {
-                return;
+            if (snake.move === false) {
+                if (e.keyCode === 13) { //enter
+                    startGame();
+                    console.log('start');
+                } else if (e.keyCode === 82) { //r
+                    resetGame();
+                    console.log('reset');
+                }
+            } else {
+                if (e.keyCode === 37 && snake.dir != 'right') {
+                    snake.dir = 'left'
+                } else if (e.keyCode === 38 && snake.dir != 'down') {
+                    snake.dir = 'up'
+                } else if (e.keyCode === 39 && snake.dir != 'left') {
+                    snake.dir = 'right'
+                } else if (e.keyCode === 40 && snake.dir != 'up') {
+                    snake.dir = 'down'
+                } else if (e.keyCode === 82) { //r
+                    resetGame();
+                    console.log('reset');
+                } else if (e.keyCode === 80) { //p
+                    pauseGame();
+                    console.log('pause');
+                }
             }
-            if (e.keyCode === 37 && snake.dir != 'right') {
-                snake.dir = 'left'
-            } else if (e.keyCode === 38 && snake.dir != 'down') {
-                snake.dir = 'up'
-            } else if (e.keyCode === 39 && snake.dir != 'left') {
-                snake.dir = 'right'
-            } else if (e.keyCode === 40 && snake.dir != 'up') {
-                snake.dir = 'down'
-            } else if (e.keyCode === 13 && snake.move == false) {
-                setInterval(snakeMove, snake.speed);
-                snake.move = true;
-            }
-            //clearTimeout(snakeBodyTimeout);
-
-            //snakeBodyMove();
         }
 
         //main
         function snakeMove() {
-
+            clearTimeout(snakeMoveTimeout);
             switch (snake.dir) {
                 case 'left':
                     snake.x -= 1;
@@ -123,47 +150,44 @@
                     snake.y += 1;
                     break;
             }
+            //先移動再判斷下一步是否犯規
 
-            //checkBorder();//判斷死亡條件1:觸碰邊界
-            //checkTouchBody();//判斷死亡條件2:觸碰本身
-            if (snake.x >= size || snake.x < 0 || snake.y >= size || snake.y < 0) {
-                alert('gg');
-                clearInterval(snakeMoveInterval);
-                snake.move = false;
-                console.log('s');
-                return;
-            }
+            checkBorder(); //判斷死亡條件1:觸碰邊界
+            checkTouchBody();//判斷死亡條件2:觸碰本身
 
-            console.log(snakeBody);
-            if (snake.y == food.y && snake.x == food.x) {
-                eatFood();
-            } else {
-                snakeBody[0].className = '';
-                snakeBody.shift();
-                snakeBody.push(box[snake.y][snake.x]);
-                snakeBody[snakeBody.length - 1].className = 'blue';
+            if (snake.move == true) {
+                if (snake.y == food.y && snake.x == food.x) {
+                    eatFood();
+                    snakeBody.push(box[snake.y][snake.x]);
+                    snakeBody[snakeBody.length - 1].className = 'blue';
+
+                } else {
+                    snakeBody[0].className = '';
+                    snakeBody.shift();
+                    snakeBody.push(box[snake.y][snake.x]);
+                    snakeBody[snakeBody.length - 1].className = 'blue';
+                }
+                snakeMoveTimeout = setTimeout(snakeMove, snake.speed);
+
             }
         }
 
         //判斷死亡條件1:碰觸邊界
         function checkBorder() {
             if (snake.x >= size || snake.x < 0 || snake.y >= size || snake.y < 0) {
-                alert('gg');
-                clearInterval(snakeMoveInterval);
+                alert('碰觸邊界');
                 snake.move = false;
-                console.log('s');
-                return;
             }
         }
+
         //判斷死亡條件2:觸碰本身
         function checkTouchBody() {
-            if (box[snake.y][snake.x].className = 'blue') {
-                alert('碰自己');
-                clearInterval(snakeMoveInterval);
-                return;
+            for (var i = 0; i < snakeBody.length; i++) {
+                if (snakeBody[i] == box[snake.y][snake.x]) {
+                    alert('碰自己');
+                    snake.move = false;
+                }
             }
-            // if(snakeBody.indexOf)
-            // if(snake.y=)
         }
 
         function foodLight() {
@@ -171,14 +195,20 @@
         }
 
         function eatFood() {
+            updateScore();
+            updateSpeed();
+            food.x = Math.floor(Math.random() * size)
+            food.y = Math.floor(Math.random() * size)
+        }
+
+        function updateSpeed() {
+            if (snake.speed > 100) {
+                snake.speed -= 20;
+            }
+        }
+
+        function updateScore() {
             score += 1;
             scoreBoard.textContent = score;
-            snake.speed = snake.speed - (parseInt(score/2)*50);
-            setInterval(snakeMove, snake.speed);
-            level.textContent=snake.speed;  
-            //console.log(updateSpeed);
-            food.x = Math.floor(Math.random() * size)
-            food.y = Math.floor(Math.random() * size)        
-            snakeBody.push(box[snake.y][snake.x]);
-            snakeBody[snakeBody.length - 1].className = 'blue';
+            levelBoard.textContent = snake.speed;
         }
