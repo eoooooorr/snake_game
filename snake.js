@@ -28,6 +28,7 @@
         var box = [];
         var trs;
         var pauseflag = false;
+        var levelColor=['#FFDCDC','#FFC1C1','#FFAFAF','#FF9696','#FF7575','#FF5454','#FF2D2D']
 
         var food = {
             x: Math.floor(Math.random() * size),
@@ -209,6 +210,14 @@
 
         function updateScore() {
             score += 1;
+            var levelText =parseInt(score/3);
             scoreBoard.textContent = score;
-            levelBoard.textContent = snake.speed;
+            if(levelText<=7){
+                levelBoard.textContent = levelText+1;      
+                levelBoard.parentElement.style.color=levelColor[levelText];
+            }
+            else{
+                levelBoard.textContent = 'Max';      
+            }
+           
         }
