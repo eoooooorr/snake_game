@@ -56,10 +56,6 @@ p {
     color: white;
 }
 
-.lip {
-    font-size: 1rem;
-
-}
 
 .buttons {
     width: auto;
@@ -142,4 +138,20 @@ ul {
     border: 1px solid #000;
     border-radius: 30px;
 
+}
+
+.cl-menu p {
+    font-size: 1rem;
+    font-family: "Microsoft JhengHei";
+}
+
+#rank{
+    position: absolute;
+    right: 50px;
+    color: white;
+    font-size: 1rem;
+    font-family: "Microsoft JhengHei";
+}
+#rank td{
+    width: 50px;
 }

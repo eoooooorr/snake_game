@@ -4,6 +4,7 @@
         var body = document.querySelector('body');
         var scoreBoard = document.querySelector('#score');
         var levelBoard = document.querySelector('#level');
+        var rankBoard = document.querySelector('#rank');
 
         //監聽
         startBtn.addEventListener('click', startGame);
@@ -28,7 +29,7 @@
         var box = [];
         var trs;
         var pauseflag = false;
-        var levelColor=['#FFDCDC','#FFC1C1','#FFAFAF','#FF9696','#FF7575','#FF5454','#FF2D2D']
+        var levelColor = ['#FFDCDC', '#FFC1C1', '#FFAFAF', '#FF9696', '#FF7575', '#FF5454', '#FF2D2D']
 
         var food = {
             x: Math.floor(Math.random() * size),
@@ -154,7 +155,7 @@
             //先移動再判斷下一步是否犯規
 
             checkBorder(); //判斷死亡條件1:觸碰邊界
-            checkTouchBody();//判斷死亡條件2:觸碰本身
+            checkTouchBody(); //判斷死亡條件2:觸碰本身
 
             if (snake.move == true) {
                 if (snake.y == food.y && snake.x == food.x) {
@@ -178,17 +179,38 @@
             if (snake.x >= size || snake.x < 0 || snake.y >= size || snake.y < 0) {
                 alert('碰觸邊界');
                 snake.move = false;
+                saveRank();
             }
         }
 
         //判斷死亡條件2:觸碰本身
         function checkTouchBody() {
-            for (var i = 0; i < snakeBody.length; i++) {
-                if (snakeBody[i] == box[snake.y][snake.x]) {
-                    alert('碰自己');
-                    snake.move = false;
+            if (snake.move == true) {
+                for (var i = 0; i < snakeBody.length; i++) {
+                    if (snakeBody[i] == box[snake.y][snake.x]) {
+                        alert('碰自己');
+                        snake.move = false;
+                    }
                 }
             }
+        }
+
+        function saveRank() {
+            var rank = [];
+            var time = new Date();
+            rank.push(score);
+            var td = document.createElement('td');
+            var td2 = document.createElement('td');
+            td.innerText = score;
+            td2.innerText = time.getHours() + ':' + time.getMinutes();
+
+            var tr = document.createElement('tr');
+
+            tr.appendChild(td2);
+            tr.appendChild(td);
+            rankBoard.appendChild(tr);
+
+            localStorage.setItem('rankData', rank);
         }
 
         function foodLight() {
@@ -210,14 +232,13 @@
 
         function updateScore() {
             score += 1;
-            var levelText =parseInt(score/3);
+            var levelText = parseInt(score / 3);
             scoreBoard.textContent = score;
-            if(levelText<=7){
-                levelBoard.textContent = levelText+1;      
-                levelBoard.parentElement.style.color=levelColor[levelText];
+            if (levelText <= 7) {
+                levelBoard.textContent = levelText + 1;
+                levelBoard.parentElement.style.color = levelColor[levelText];
+            } else {
+                levelBoard.textContent = 'Max';
             }
-            else{
-                levelBoard.textContent = 'Max';      
-            }
-           
+
         }

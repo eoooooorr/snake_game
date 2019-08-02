@@ -12,56 +12,52 @@
     <div id='menu'>
         <ul class="cl-menu">
             <li>
-                <p class="lip">貪吃蛇</p>
+                <p>貪吃蛇</p>
                 <ul>
                     <li>
-                        <p class="lip">貪吃的蛇</p>
-                    </li>
-
-
-                </ul>
-            </li>
-            <li>
-                <p class="lip">基本介紹</p>
-                <ul>
-                    <li>
-                        <p class="lip">蛇 : 藍色 食物 : 黃色</p>
-                    </li>
-                    <li>
-                        <p class="lip">隨著等級提升，速度也會隨之提升</p>
-                    </li>
-
-                </ul>
-            </li>
-            <li>
-                <p class="lip">操作方式 </p>
-                <ul>
-                    <li>
-                        <p class="lip">上:↑下:↓左:←右:→</p>
+                        <p>貪吃的蛇</p>
                     </li>
                 </ul>
             </li>
             <li>
-                <p class="lip">遊戲規則 </p>
+                <p>基本介紹</p>
                 <ul>
                     <li>
-                        <p class="lip">1.不可以走出邊界</p>
+                        <p>蛇 : 藍色 食物 : 黃色</p>
                     </li>
                     <li>
-                        <p class="lip">2.不可以吃到蛇本身</p>
+                        <p>隨著等級提升，速度也會隨之提升</p>
                     </li>
                 </ul>
             </li>
             <li>
-                <p class="lip">得分方式</p>
+                <p>操作方式 </p>
                 <ul>
                     <li>
-                        <p class="lip">每吃一個食物分數+1</p>
+                        <p>上:↑下:↓左:←右:→</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p>遊戲規則 </p>
+                <ul>
+                    <li>
+                        <p>1.不可以走出邊界</p>
+                    </li>
+                    <li>
+                        <p>2.不可以吃到蛇本身</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p>得分方式</p>
+                <ul>
+                    <li>
+                        <p>每吃一個食物分數+1</p>
                     </li>
 
                 </ul>
             </li>
-
         </ul>
 
     </div>
@@ -70,7 +66,20 @@
     <h1 id="score">0</h1>
     <h1>Level&nbsp;&nbsp;<span id="level">1</span></h1>
     <!--    <h1 id="speed">500</h1>-->
-
+    <table id="rank">
+        <tr>
+            <td>count</td>
+            <td>score</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
 
     <table id="table">
 
@@ -82,9 +91,9 @@
     <button id="resetBtn" class="buttons">Reset</button>
     <button id="pauseBtn" class="buttons">Pause</button>
 
-    
-<script src="snake.js">
-</script>
+
+    <script src="snake.js">
+    </script>
 </body>
 
 </html>
