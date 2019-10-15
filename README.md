@@ -2,9 +2,8 @@
 ![image](https://github.com/npcenthusiasm/snake_game/blob/master/snake1.png)
 ![image](https://github.com/npcenthusiasm/snake_game/blob/master/snake2.png)
 
+### Demo
 https://npcenthusiasm.github.io/snake_game/
-
-這是一個簡單的貪吃蛇遊戲
 
 ### 目的
 - 練習HTML、CSS
